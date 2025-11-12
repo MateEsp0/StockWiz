@@ -36,7 +36,7 @@ jobs:
 
       - name: Wait and check health endpoints
         run: |
-          echo "Waiting for services..."
+          echo "Waiting for services......"
           sleep 10
           echo "Checking API Gateway health:"
           curl -f http://localhost:8000/health
