@@ -1,0 +1,25 @@
+name: CD PROD - StockWiz
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  cd-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build services
+        run: docker compose -f docker-compose.yml build
+
+      - name: Simulated deploy
+        run: |
+          echo "Deployment finished OK!"
+
+      - name: Release notes
+        run: |
+          echo "Release on $(date)" > release-notes.txt
+          cat release-notes.txt
