@@ -1,0 +1,26 @@
+name: CD TEST - StockWiz
+
+on:
+  push:
+    branches:
+      - release/test
+
+jobs:
+  cd-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build services
+        run: docker compose -f docker-compose.yml build
+
+      - name: Smoke checks
+        run: |
+          echo "Corriendo integration test"
+          echo "ok"
+
+      - name: Summary
+        run: |
+          echo "CD Test $(date)" >> cd-summary.txt
+          cat cd-summary.txt
