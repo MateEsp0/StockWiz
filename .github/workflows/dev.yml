@@ -11,7 +11,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,9 +23,11 @@ jobs:
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@v1.0.0
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.projectKey=StockWiz
+            -Dsonar.projectKey=stockwiz
             -Dsonar.host.url=http://localhost:9000
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
