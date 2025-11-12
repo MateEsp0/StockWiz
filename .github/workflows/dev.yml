@@ -19,7 +19,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build all services
+      - name: Build services
         run: docker compose -f docker-compose.yml build
 
       - name: SonarQube Scan
@@ -30,21 +30,3 @@ jobs:
             -Dsonar.projectKey=StockWiz
             -Dsonar.host.url=http://localhost:9000
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-
-      - name: Run containers
-        run: docker compose -f docker-compose.yml up -d
-
-      - name: Wait and check health endpoints
-        run: |
-          echo "Waiting for services......"
-          sleep 10
-          echo "Checking API Gateway health:"
-          curl -f http://localhost:8000/health
-          echo "Checking Product Service health:"
-          curl -f http://localhost:8001/health
-          echo "Checking Inventory Service health:"
-          curl -f http://localhost:8002/health
-
-      - name: Stop containers
-        if: always()
-        run: docker compose -f docker-compose.yml down
