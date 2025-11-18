@@ -1,41 +1,25 @@
-# ---- PYTHON ----
+# Python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.so
 
-# ---- GO ----
+# Go
 *.exe
 *.test
 
-# ---- ENVIRONMENTS ----
-env/
-venv/
-ENV/
-*.env
-*.env.local
-
-# ---- OS FILES ----
-.DS_Store
-Thumbs.db
-
-# ---- IDE ----
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# ---- LOGS ----
-*.log
-
-# ---- TERRAFORM ----
+# Terraform
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
 .terraform.lock.hcl
 
-# ---- AWS OUTPUT FILES ----
+# AWS CLI local outputs
 event.json
 response.json
 
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
