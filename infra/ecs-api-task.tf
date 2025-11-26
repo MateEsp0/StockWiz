@@ -5,8 +5,8 @@ resource "aws_ecs_task_definition" "api_gateway" {
   cpu                      = "256"
   memory                   = "512"
 
-  execution_role_arn = data.aws_iam_role.lambda_role.arn
-  task_role_arn      = data.aws_iam_role.lambda_role.arn
+  execution_role_arn = data.aws_iam_role.lab_role.arn
+  task_role_arn      = data.aws_iam_role.lab_role.arn
 
 
   container_definitions = jsonencode([
@@ -17,11 +17,18 @@ resource "aws_ecs_task_definition" "api_gateway" {
 
       portMappings = [
         {
-          containerPort = 8080
-          hostPort      = 8080
+          containerPort = 8000
+          hostPort      = 8000
           protocol      = "tcp"
         }
       ]
+      healthCheck = {
+        command     = ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8000/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 10
+      }
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -31,6 +38,10 @@ resource "aws_ecs_task_definition" "api_gateway" {
           awslogs-stream-prefix = "ecs"
         }
       }
+      depends_on = [
+        aws_cloudwatch_log_group.api_gateway
+      ]
+
     }
   ])
 }
