@@ -8,6 +8,16 @@ resource "aws_ecs_service" "inventory_service" {
   network_configuration {
     subnets          = [data.aws_subnet.subnet_a.id, data.aws_subnet.subnet_f.id]
     assign_public_ip = true
-    security_groups  = [aws_security_group.ecs.id]
+    security_groups  = [aws_security_group.ecs_tasks_sg.id]
   }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.inventory_service_tg.arn
+    container_name   = "inventory-service"
+    container_port   = 8002
+  }
+
+  depends_on = [
+    aws_lb_listener.http_listener
+  ]
 }

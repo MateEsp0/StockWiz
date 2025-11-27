@@ -8,6 +8,16 @@ resource "aws_ecs_service" "api_gateway" {
   network_configuration {
     subnets          = [data.aws_subnet.subnet_a.id, data.aws_subnet.subnet_f.id]
     assign_public_ip = true
-    security_groups  = [aws_security_group.ecs.id]
+    security_groups  = [aws_security_group.ecs_tasks_sg.id]
   }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.api_gateway_tg.arn
+    container_name   = "api-gateway"
+    container_port   = 8000
+  }
+
+  depends_on = [
+    aws_lb_listener.http_listener
+  ]
 }
