@@ -16,8 +16,7 @@ jobs:
         run: docker compose -f docker-compose.yml build
 
       - name: Simulated deploy
-        run: |
-          echo "Deployment finished OK!"
+        run: echo "Deployment finished OK!"
 
       - name: Release notes
         run: |
