@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 app = FastAPI()
 
@@ -46,7 +46,7 @@ def create(product: ProductCreate):
         "stock": product.stock,
         "description": product.description,
         "category": product.category,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     products[next_id] = item
     next_id += 1
@@ -69,7 +69,7 @@ def update(id: int, data: ProductUpdate):
     if data.category is not None:
         p["category"] = data.category
 
-    p["updated_at"] = datetime.utcnow().isoformat()
+    p["updated_at"] = datetime.now(timezone.utc).isoformat()
     return p
 
 @app.delete("/products/{id}")

@@ -18,6 +18,12 @@ type Inventory struct {
 	LastUpdated time.Time `json:"last_updated"`
 }
 
+const (
+	PathInventoryID = "/inventory/{id}"
+	MsgNotFound     = "Not found"
+	MsgInvalidID    = "Invalid ID"
+)
+
 var (
 	inventoryData = []Inventory{}
 	nextID        = 1
@@ -38,13 +44,13 @@ func main() {
 		json.NewEncoder(w).Encode(inventoryData)
 	})
 
-	r.Get("/inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
+	r.Get(PathInventoryID, func(w http.ResponseWriter, r *http.Request) {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 
 		if err != nil {
 			w.WriteHeader(400)
-			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid ID"})
+			json.NewEncoder(w).Encode(map[string]string{"error": MsgInvalidID})
 			return
 		}
 
@@ -56,14 +62,14 @@ func main() {
 		}
 
 		w.WriteHeader(404)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Not found"})
+		json.NewEncoder(w).Encode(map[string]string{"error": MsgNotFound})
 	})
 
 	r.Get("/inventory/product/{product_id}", func(w http.ResponseWriter, r *http.Request) {
 		pid, err := strconv.Atoi(chi.URLParam(r, "product_id"))
 		if err != nil {
 			w.WriteHeader(400)
-			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid ID"})
+			json.NewEncoder(w).Encode(map[string]string{"error": MsgInvalidID})
 			return
 		}
 
@@ -94,7 +100,7 @@ func main() {
 		json.NewEncoder(w).Encode(req)
 	})
 
-	r.Put("/inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
+	r.Put(PathInventoryID, func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
 		var body struct {
@@ -120,10 +126,10 @@ func main() {
 			}
 		}
 
-		http.Error(w, "Not found", 404)
+		http.Error(w, MsgNotFound, 404)
 	})
 
-	r.Delete("/inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
+	r.Delete(PathInventoryID, func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
 		mutex.Lock()
@@ -137,7 +143,7 @@ func main() {
 			}
 		}
 
-		http.Error(w, "Not found", 404)
+		http.Error(w, MsgNotFound, 404)
 	})
 
 	http.ListenAndServe(":8002", r)
