@@ -6,7 +6,7 @@ resource "aws_ecs_service" "product_service" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = [data.aws_subnet.subnet_a.id, data.aws_subnet.subnet_f.id]
+    subnets          = data.aws_subnets.public_subnets.ids
     assign_public_ip = true
     security_groups  = [aws_security_group.ecs_tasks_sg.id]
   }
@@ -21,4 +21,3 @@ resource "aws_ecs_service" "product_service" {
     aws_lb_listener.http_listener
   ]
 }
-

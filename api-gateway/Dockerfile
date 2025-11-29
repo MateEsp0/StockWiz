@@ -6,8 +6,7 @@ RUN apk add --no-cache git
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY main.go .
-COPY static ./static
+COPY main.go . 
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o api-gateway .
 

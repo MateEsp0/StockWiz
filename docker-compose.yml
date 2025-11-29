@@ -27,13 +27,17 @@ services:
       dockerfile: Dockerfile
     container_name: api_gateway
     environment:
-      PRODUCT_SERVICE_URL: http://product_service:8001
-      INVENTORY_SERVICE_URL: http://inventory_service:8002
+      PRODUCT_SERVICE_URL: http://stockwiz-product-service:8001
+      INVENTORY_SERVICE_URL: http://stockwiz-inventory-service:8002
     ports:
       - "8000:8000"
     networks:
       - microservices_network
     restart: unless-stopped
+    
+    depends_on:
+      - product_service
+      - inventory_service
 
 networks:
   microservices_network:

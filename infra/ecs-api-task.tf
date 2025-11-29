@@ -8,12 +8,25 @@ resource "aws_ecs_task_definition" "api_gateway" {
   execution_role_arn = data.aws_iam_role.lab_role.arn
   task_role_arn      = data.aws_iam_role.lab_role.arn
 
-
   container_definitions = jsonencode([
     {
       name      = "api-gateway"
       image     = "${aws_ecr_repository.api_gateway.repository_url}:latest"
       essential = true
+
+      environment = [
+        {
+          name  = "PRODUCT_SERVICE_URL"
+          value = "http://${aws_lb.stockwiz_alb.dns_name}"
+        },
+        {
+          name  = "INVENTORY_SERVICE_URL"
+          value = "http://${aws_lb.stockwiz_alb.dns_name}"
+        }
+      ]
+
+
+
 
       portMappings = [
         {
@@ -22,8 +35,9 @@ resource "aws_ecs_task_definition" "api_gateway" {
           protocol      = "tcp"
         }
       ]
+
       healthCheck = {
-        command     = ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8000/health || exit 1"]
+        command     = ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8000/api/health || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
@@ -38,10 +52,6 @@ resource "aws_ecs_task_definition" "api_gateway" {
           awslogs-stream-prefix = "ecs"
         }
       }
-      depends_on = [
-        aws_cloudwatch_log_group.api_gateway
-      ]
-
     }
   ])
 }

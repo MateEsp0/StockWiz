@@ -1,22 +1,31 @@
+##############################################
+# NETWORK CONFIG FOR LEARNER LAB (PUBLIC ONLY)
+##############################################
+
+# Import the existing VPC from Learner Lab
 data "aws_vpc" "main" {
   id = "vpc-0b5032bc803eb71c1"
 }
 
-data "aws_subnet" "subnet_a" {
-  id = "subnet-0f942cbe90338ff90"
+# Automatically fetch ALL public subnets in that VPC
+data "aws_subnets" "public_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.main.id]
+  }
+
+  # Only subnets where AWS assigns public IPs automatically
+  filter {
+    name   = "map-public-ip-on-launch"
+    values = ["true"]
+  }
 }
 
-data "aws_subnet" "subnet_f" {
-  id = "subnet-0ab56781236ad11c0"
+# Outputs to verify
+output "public_subnet_ids" {
+  value = data.aws_subnets.public_subnets.ids
 }
 
 output "vpc_id" {
   value = data.aws_vpc.main.id
-}
-
-output "subnet_ids" {
-  value = [
-    data.aws_subnet.subnet_a.id,
-    data.aws_subnet.subnet_f.id
-  ]
 }

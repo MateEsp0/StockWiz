@@ -5,15 +5,17 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type Inventory struct {
-	ID        int    `json:"id"`
-	ProductID int    `json:"product_id"`
-	Quantity  int    `json:"quantity"`
-	Warehouse string `json:"warehouse"`
+	ID          int       `json:"id"`
+	ProductID   int       `json:"product_id"`
+	Quantity    int       `json:"quantity"`
+	Warehouse   string    `json:"warehouse"`
+	LastUpdated time.Time `json:"last_updated"`
 }
 
 var (
@@ -37,9 +39,12 @@ func main() {
 	})
 
 	r.Get("/inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+
 		if err != nil {
-			http.Error(w, "Invalid ID", 400)
+			w.WriteHeader(400)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid ID"})
 			return
 		}
 
@@ -49,7 +54,27 @@ func main() {
 				return
 			}
 		}
-		http.Error(w, "Not found", 404)
+
+		w.WriteHeader(404)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Not found"})
+	})
+
+	r.Get("/inventory/product/{product_id}", func(w http.ResponseWriter, r *http.Request) {
+		pid, err := strconv.Atoi(chi.URLParam(r, "product_id"))
+		if err != nil {
+			w.WriteHeader(400)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid ID"})
+			return
+		}
+
+		for _, inv := range inventoryData {
+			if inv.ProductID == pid {
+				json.NewEncoder(w).Encode(inv)
+				return
+			}
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{})
 	})
 
 	r.Post("/inventory", func(w http.ResponseWriter, r *http.Request) {
@@ -61,11 +86,58 @@ func main() {
 
 		mutex.Lock()
 		req.ID = nextID
+		req.LastUpdated = time.Now()
 		nextID++
 		inventoryData = append(inventoryData, req)
 		mutex.Unlock()
 
 		json.NewEncoder(w).Encode(req)
+	})
+
+	r.Put("/inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+		var body struct {
+			Quantity  int    `json:"quantity"`
+			Warehouse string `json:"warehouse"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, "Bad request", 400)
+			return
+		}
+
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		for i := range inventoryData {
+			if inventoryData[i].ID == id {
+				inventoryData[i].Quantity = body.Quantity
+				inventoryData[i].Warehouse = body.Warehouse
+				inventoryData[i].LastUpdated = time.Now()
+				json.NewEncoder(w).Encode(inventoryData[i])
+				return
+			}
+		}
+
+		http.Error(w, "Not found", 404)
+	})
+
+	r.Delete("/inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		for i := range inventoryData {
+			if inventoryData[i].ID == id {
+				inventoryData = append(inventoryData[:i], inventoryData[i+1:]...)
+				json.NewEncoder(w).Encode(map[string]string{"status": "deleted"})
+				return
+			}
+		}
+
+		http.Error(w, "Not found", 404)
 	})
 
 	http.ListenAndServe(":8002", r)

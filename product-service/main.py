@@ -11,12 +11,16 @@ next_id = 1
 class ProductCreate(BaseModel):
     name: str
     price: float
-    stock: int
+    stock: int = 0
+    description: Optional[str] = None
+    category: Optional[str] = None
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     price: Optional[float] = None
     stock: Optional[int] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
 
 @app.get("/health")
 def health():
@@ -40,6 +44,8 @@ def create(product: ProductCreate):
         "name": product.name,
         "price": product.price,
         "stock": product.stock,
+        "description": product.description,
+        "category": product.category,
         "created_at": datetime.utcnow().isoformat()
     }
     products[next_id] = item
@@ -58,6 +64,10 @@ def update(id: int, data: ProductUpdate):
         p["price"] = data.price
     if data.stock is not None:
         p["stock"] = data.stock
+    if data.description is not None:
+        p["description"] = data.description
+    if data.category is not None:
+        p["category"] = data.category
 
     p["updated_at"] = datetime.utcnow().isoformat()
     return p
