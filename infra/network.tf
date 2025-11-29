@@ -21,11 +21,3 @@ data "aws_subnets" "public_subnets" {
   }
 }
 
-# Outputs to verify
-output "public_subnet_ids" {
-  value = data.aws_subnets.public_subnets.ids
-}
-
-output "vpc_id" {
-  value = data.aws_vpc.main.id
-}
