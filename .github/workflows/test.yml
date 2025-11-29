@@ -15,10 +15,17 @@ jobs:
       - name: Build services
         run: docker compose -f docker-compose.yml build
 
-      - name: Smoke checks
+      - name: Install k6
         run: |
-          echo "Corriendo integration test"
-          echo "ok"
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg
+          wget -q https://dl.k6.io/key.gpg -O- | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      - name: Run load test with K6
+        run: k6 run testing/loadtest.js
 
       - name: Summary
         run: |
