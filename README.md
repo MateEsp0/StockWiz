@@ -112,9 +112,9 @@ aws s3 sync frontend/ s3://stockwiz-frontend-mateoespinosa/
 - S3  
 - API Gateway propio  
 
-## 13. Acceso a la aplicación
+## 13. Acceso a la aplicación (S3)
 
 ```
-http://<alb_dns_name>
+http://stockwiz-frontend-mateoespinosa.s3-website-us-east-1.amazonaws.com/
 ```
 
