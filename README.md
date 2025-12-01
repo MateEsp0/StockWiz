@@ -5,6 +5,11 @@ Implementa prácticas de DevOps como CI/CD, pruebas automatizadas, infraestructu
 
 Este documento contiene las instrucciones necesarias para ejecutar, desplegar y configurar el proyecto.
 
+## 0. Estructura del Proyecto
+
+Repositorio GitHub:
+https://github.com/MateEsp0/StockWiz
+
 ## 1. Estructura del Proyecto
 
 ```
