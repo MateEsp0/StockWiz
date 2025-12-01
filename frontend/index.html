@@ -62,7 +62,7 @@
 
         <div class="stats" id="stats">
             <div class="stat-card">
-                <div class="stat-value" id="totalProducts">0</div>q
+                <div class="stat-value" id="totalProducts">0</div>
                 <div class="stat-label">Total Products</div>
             </div>
             <div class="stat-card">
@@ -186,26 +186,34 @@
                 let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Warehouse</th><th>Actions</th></tr></thead><tbody>';
                 
                 products.forEach(product => {
-                    const stock = product.inventory ? product.inventory.quantity : 'N/A';
-                    const warehouse = product.inventory ? product.inventory.warehouse : 'N/A';
-                    const stockBadge = product.inventory ? 
-                        (product.inventory.quantity < 30 ? '<span class="badge danger">Low</span>' : 
-                         product.inventory.quantity < 100 ? '<span class="badge warning">Medium</span>' : 
-                         '<span class="badge success">Good</span>') : '';
 
-                    html += `<tr>
-                        <td>${product.id}</td>
-                        <td><strong>${product.name}</strong><br><small>${product.description || ''}</small></td>
-                        <td>${product.price.toFixed(2)}</td>
-                        <td>${product.category || '-'}</td>
-                        <td>${stock} ${stockBadge}</td>
-                        <td>${warehouse}</td>
-                        <td>
-                            <button onclick="editProduct(${product.id})">✏️</button>
-                            <button class="danger" onclick="deleteProduct(${product.id})">🗑️</button>
-                        </td>
-                    </tr>`;
-                });
+    const hasInventory = product.inventory && typeof product.inventory.quantity === 'number';
+
+    const stock = hasInventory ? product.inventory.quantity : 'N/A';
+    const warehouse = hasInventory ? product.inventory.warehouse : 'N/A';
+
+    const stockBadge = hasInventory
+        ? (product.inventory.quantity < 30
+            ? '<span class="badge danger">Low</span>'
+            : product.inventory.quantity < 100
+                ? '<span class="badge warning">Medium</span>'
+                : '<span class="badge success">Good</span>')
+        : '';
+
+    html += `<tr>
+        <td>${product.id}</td>
+        <td><strong>${product.name}</strong><br><small>${product.description || ''}</small></td>
+        <td>${product.price.toFixed(2)}</td>
+        <td>${product.category || '-'}</td>
+        <td>${stock} ${stockBadge}</td>
+        <td>${warehouse}</td>
+        <td>
+            <button onclick="editProduct(${product.id})">✏️</button>
+            <button class="danger" onclick="deleteProduct(${product.id})">🗑️</button>
+        </td>
+    </tr>`;
+});
+
 
                 html += '</tbody></table>';
                 content.innerHTML = html;
