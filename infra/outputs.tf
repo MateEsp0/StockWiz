@@ -1,7 +1,3 @@
-##############################################
-# OUTPUTS PRINCIPALES DEL PROYECTO STOCKWIZ
-##############################################
-
 # VPC utilizada
 output "vpc_id" {
   description = "ID de la VPC utilizada por StockWiz"
@@ -41,7 +37,3 @@ output "alb_dns_name" {
   description = "DNS público del Application Load Balancer"
   value       = aws_lb.stockwiz_alb.dns_name
 }
-
-##############################################
-# FIN DE OUTPUTS
-##############################################

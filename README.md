@@ -27,7 +27,12 @@ StockWiz/
 - Cuenta de AWS con permisos para ECS, ECR, IAM, CloudWatch, S3  
 - Git  
 
-## 3. Ejecución en Local
+## 3. Arquitectura del Sistema
+
+![Arquitectura General](./docs/arquitectura.png)
+
+
+## 4. Ejecución en Local
 
 ```
 docker-compose up --build
@@ -40,7 +45,40 @@ Endpoints localmente:
 - Inventory Service: http://localhost:8002/inventory  
 - Frontend: abrir frontend/index.html  
 
-## 4. Pipeline CI/CD
+## 5. Pipeline CI/CD
+```
+             ┌──────────────────────────────┐
+             │           Developer           │
+             └───────────────┬──────────────┘
+                             │  (git push)
+                    ┌────────▼────────┐
+                    │   DEVELOP branch │
+                    └────────┬────────┘
+                             │ Trigger CI DEV
+                             ▼
+                ┌────────────────────────────┐
+                │   CI DEV - Sonar + Build   │
+                └───────────┬────────────────┘
+                            │ PR aprobado
+                    ┌───────▼────────┐
+                    │ release/test    │
+                    └───────┬────────┘
+                            │ Trigger CI TEST
+                            ▼
+               ┌─────────────────────────────┐
+               │   CI TEST - Build + K6      │
+               └──────────┬──────────────────┘
+                           │ Tag de release
+                   ┌──────▼──────────┐
+                   │      main       │
+                   └──────┬──────────┘
+                          │ Trigger CD PROD
+                          ▼
+           ┌────────────────────────────────────┐
+           │  CD PROD - Build + Deploy ECS       │
+           └─────────────────────────────────────┘
+
+```
 
 ### DEV
 - Push a develop  
@@ -54,7 +92,7 @@ Endpoints localmente:
 - Merge release/test → main  
 - Publica imágenes y despliega  
 
-## 5. Infraestructura como Código
+## 6. Infraestructura como Código
 
 ```
 cd infra
@@ -64,19 +102,19 @@ terraform apply
 
 Outputs importantes: ALB DNS, ECR URLs, ECS Cluster.
 
-## 6. Publicación de Imágenes en ECR
+## 7. Publicación de Imágenes en ECR
 
 ```
 ./deploy_all.sh
 ```
 
-## 7. Despliegue ECS
+## 8. Despliegue ECS
 
 1. Terraform  
 2. deploy_all.sh  
 3. Forzar nuevo deploy en ECS  
 
-## 8. Testing y Calidad
+## 9. Testing y Calidad
 
 ```
 k6 run testing/loadtest.js
@@ -84,27 +122,27 @@ k6 run testing/loadtest.js
 
 SonarCloud integrado en CI.
 
-## 9. Frontend en S3
+## 10. Frontend en S3
 
 ```
 aws s3 cp frontend/index.html s3://stockwiz-frontend-mateoespinosa/index.html
 aws s3 sync frontend/ s3://stockwiz-frontend-mateoespinosa/
 ```
 
-## 10. Estrategia Git
+## 11. Estrategia Git
 
 - main  
 - release/test  
 - develop  
 - feature/*  
 
-## 11. Observabilidad
+## 12. Observabilidad
 
 - Dashboard CloudWatch  
 - Alarmas  
 - Logs ECS  
 
-## 12. Decisiones de Diseño
+## 13. Decisiones de Diseño
 
 - ECS Fargate  
 - Terraform  
@@ -112,7 +150,7 @@ aws s3 sync frontend/ s3://stockwiz-frontend-mateoespinosa/
 - S3  
 - API Gateway propio  
 
-## 13. Acceso a la aplicación (S3)
+## 14. Acceso a la aplicación (S3)
 
 ```
 http://stockwiz-frontend-mateoespinosa.s3-website-us-east-1.amazonaws.com/

@@ -1,6 +1,4 @@
-#################################################
 # ECS SERVICE – API GATEWAY (PUBLIC SUBNETS)
-#################################################
 
 resource "aws_ecs_service" "api_gateway" {
   name            = "stockwiz-api-gateway-service"
